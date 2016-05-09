@@ -11,7 +11,7 @@ class jeu:
         self.real_time=0
         self.end_time=0
 
-        self.more_meteores=1
+        self.more_meteores=1 #Test for github
 
         self.tab_destroy_time=[]
         self.destroy_firetab=[]
