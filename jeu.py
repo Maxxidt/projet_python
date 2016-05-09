@@ -89,21 +89,39 @@ class jeu:
         self.comets_time=time.time()
         self_comets_y=0
         self_comets_x=random.randint(200,900)
-        depx=2*(self.x)/sqrt((self_comets_x)**2+(self_comets_y)**2)
-        depy=2*(self.y)/sqrt((self_comets_x)**2+(self_comets_y)**2)        
-        self.comets=self.comets+[[self_comets_x,self_comets_y,-depx,depy]]
+        depx=2*(self.x-self_comets_x)/sqrt((self_comets_x-self.x)**2+(self_comets_y-self.y)**2)
+        depy=2*(self.y-self_comets_y)/sqrt((self_comets_x-self.x)**2+(self_comets_y-self.y)**2)       
+        self.comets=self.comets+[[self_comets_x,self_comets_y,depx,depy]]
        
     def collision(self): 
         
         for i in range(len(self.firetab)):
             for j in range(len(self.comets)):
-                if (self.comets[j][0]>self.firetab[i][0]) and self.comets[j][0]<(self.firetab[i][0]+65):
-                    if (self.comets[j][1]>self.firetab[i][1]) and self.comets[j][1]<(self.firetab[i][1]+65):
+                if ((self.comets[j][0]>self.firetab[i][0]) and self.comets[j][0]<(self.firetab[i][0]+25))or((self.comets[j][0]+59>self.firetab[i][0]) and self.comets[j][0]+59<(self.firetab[i][0]+25)):
+                    if ((self.comets[j][1]>self.firetab[i][1]) and self.comets[j][1]<(self.firetab[i][1]+26))or((self.comets[j][1]+47>self.firetab[i][1]) and self.comets[j][1]+47<(self.firetab[i][1]+26)):
                         self.destroy_comets.append(j)
                         self.destroy_firetab.append(i)
                         self.tab_destroy_time=self.tab_destroy_time+[[0,0,0]]
-                        
+    def collision_fusee(self):
+        tab=[]
+        for j in range(len(self.comets)):
+            if ((self.comets[j][0]>self.x) and self.comets[j][0]<self.x+125)or((self.comets[j][0]+59>self.x) and self.comets[j][0]+59<self.x+125):
+                if ((self.comets[j][1]>self.y) and self.comets[j][1]<self.y+125)or((self.comets[j][1]+47>self.y) and self.comets[j][1]+47<self.y+125):
+                    tab=tab+[j]
+                    self.destroy_firetab=self.destroy_firetab+[j]
+        for i in range (len(tab)):
+            self.comets.pop(tab[i]) 
 
+    def comet_out_of_window(self):
+        tab=[]
+        for i in range(len(self.comets)):
+            if self.comets[i][0]+30<0 or self.comets[i][1]-24>540 :
+                tab=tab+[i]
+        for i in range (len(tab)):
+            self.comets.pop(tab[i])
+           
+        
+        
     def printer(self):
         if self.numero_canvas==1:
             canvas=self.canvas
@@ -138,6 +156,7 @@ class jeu:
             canvas.create_image(i[0],i[1],image=self.comets_pic)
         canvas.create_image(self.x,self.y,image=self.photo)
         self.collision()
+        self.collision_fusee()
         canvas.grid(row=0,column=0)
         
         for k in range(len(self.destroy_firetab)):
@@ -178,11 +197,13 @@ class jeu:
                     
                 self.tab_destroy_time[k][0]=self.tab_destroy_time[k][0]+1
 
-            
+
+
+        self.comet_out_of_window()
         if (self.end_time-self.comets_time)>=2/(self.more_meteores/500):
             self.comets_time=self.end_time
             self.create_new_comets()
-
+        
         self.more_meteores=self.more_meteores+1
         threading.Timer(0.00005, self.printer).start()
 
