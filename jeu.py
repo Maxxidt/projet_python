@@ -6,12 +6,14 @@ import random
 
 class jeu:
     def __init__(self):
-        self.numero_canvas=1
+        
+        self.numero_canvas=1 #Enable to switch between two canvas to avoid blink
         self.debut_time=time.time()
         self.real_time=0
         self.end_time=0
-
-        self.more_meteores=1 #Test for github
+        
+        self.more_meteores=1
+        self.number_of_collision=0
 
         self.tab_destroy_time=[]
         self.destroy_firetab=[]
@@ -44,7 +46,6 @@ class jeu:
         self.y=400
         self.x2=900
         self.y2=0
-
        
         
         self.canvas.create_image(self.x,self.y,image=self.photo)
@@ -61,6 +62,7 @@ class jeu:
         self.root.mainloop()
         
     def move(self,event):
+    #NB : Some event.char have two options because we use a french keyboard not a swedish one, so our key are not exactly in the same place
         
         if ((event.char=="z") or (event.char=="Z")or (event.char=="w")or (event.char=="W"))and (self.y>32):            
             self.y=self.y-8
@@ -94,7 +96,6 @@ class jeu:
         self.comets=self.comets+[[self_comets_x,self_comets_y,depx,depy]]
        
     def collision(self): 
-        
         for i in range(len(self.firetab)):
             for j in range(len(self.comets)):
                 if ((self.comets[j][0]>self.firetab[i][0]) and self.comets[j][0]<(self.firetab[i][0]+25))or((self.comets[j][0]+59>self.firetab[i][0]) and self.comets[j][0]+59<(self.firetab[i][0]+25)):
@@ -102,13 +103,15 @@ class jeu:
                         self.destroy_comets.append(j)
                         self.destroy_firetab.append(i)
                         self.tab_destroy_time=self.tab_destroy_time+[[0,0,0]]
-    def collision_fusee(self):
+
+    def collision_spaceship(self):
         tab=[]
         for j in range(len(self.comets)):
             if ((self.comets[j][0]>self.x) and self.comets[j][0]<self.x+125)or((self.comets[j][0]+59>self.x) and self.comets[j][0]+59<self.x+125):
                 if ((self.comets[j][1]>self.y) and self.comets[j][1]<self.y+125)or((self.comets[j][1]+47>self.y) and self.comets[j][1]+47<self.y+125):
                     tab=tab+[j]
                     self.destroy_firetab=self.destroy_firetab+[j]
+                    self.number_of_collision=self.number_of_collision+1
         for i in range (len(tab)):
             self.comets.pop(tab[i]) 
 
@@ -119,47 +122,64 @@ class jeu:
                 tab=tab+[i]
         for i in range (len(tab)):
             self.comets.pop(tab[i])
-           
-        
+
         
     def printer(self):
+        
+        #Canvas transition to avoid blink
         if self.numero_canvas==1:
             canvas=self.canvas
             self.numero_canvas=2
-           
         else:
             canvas=self.canvas2
             self.numero_canvas=1
-        
+            
+        #Time calculation to slow the game, to avoid an information saturation
         self.end_time=time.time()
         self.real_time=self.end_time-self.debut_time
         self.real_time=round(self.real_time,2)
-        
-        canvas.grid_forget()
-        canvas.delete("all")
         self.debut_time=self.end_time
+
+        #Clean the window
+        canvas.grid_forget()
+        canvas.delete("all")        
             
         for i in self.firetab:
             i[0]=i[0]+i[2]
             i[1]=i[1]+i[3]        
-
+        for i in self.comets:
+            i[0]=i[0]+i[2]
+            i[1]=i[1]+i[3]
+        
+        #Creation of the new window : background, comets and spaceship
         canvas.create_image(self.x2,self.y2,image=self.back_pic)
         
         for i in self.firetab:
             canvas.create_image(i[0],i[1],image=self.fire_pic)
                 
         for i in self.comets:
-            i[0]=i[0]+i[2]
-            i[1]=i[1]+i[3]
-                
-        for i in self.comets:
             canvas.create_image(i[0],i[1],image=self.comets_pic)
+            
         canvas.create_image(self.x,self.y,image=self.photo)
+        
+
+        #Before changing, the "life" we check if we haven't fail
+        if self.number_of_collision>4:
+            winwindow = Tk()     
+            champ_label = Label(winwindow, text="Game Over !")
+            champ_label.pack()
+            self.root.destroy()
+            winwindow.mainloop()
+            
+        canvas.create_line(20,20,300,20,fill="green",width=5)
+        canvas.create_line(300-47*self.number_of_collision,20,300,20,fill="red",width=5)
+
         self.collision()
-        self.collision_fusee()
+        self.collision_spaceship()
+        
         canvas.grid(row=0,column=0)
         
-        for k in range(len(self.destroy_firetab)):
+        for k in range(len(self.tab_destroy_time)):
             if self.destroy_firetab[k]!="none":
                 i=self.destroy_firetab[k]
                 
