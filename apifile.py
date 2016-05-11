@@ -31,6 +31,7 @@ class api :
         check=0
         connection = sqlite3.connect('listplayer.db')
         cursor = connection.execute("SELECT Email, Password FROM players")
+        print(cursor)
         for i in cursor:
             
             if i[0]==address:
@@ -45,6 +46,17 @@ class api :
             
         connection.close()
 
+    def save_score(email,score):
+        
+        connection = sqlite3.connect('listplayer.db')
+        cursor = connection.execute("SELECT Email,Score FROM players")
+        for i in cursor:
+            
+            if i[0]==email and i[1]<score:
+                connection.execute('''UPDATE players SET Score ='''+str(score)+'''  WHERE Email == "'''+email+'''"''')
+                
+        connection.commit()
+        connection.close()
             
 
         

@@ -1,13 +1,27 @@
 from tkinter import *
 from math import *
+import apifile as af
 import threading
 import time
 import random
-
+class end_game:
+    def __init__(self,score):
+            winwindow = Tk()     
+            champ_label = Label(winwindow, text="Game Over !")
+            champ_label.grid(row=0,column=0)
+            button = Button(winwindow, text="Restart") # reload the game I tried command=jeu but didn't work (spaceship doesn't move if we do that)
+            button.grid(row=1,column=0)
+            email="maximilien.drouet@edu.ece.fr" #email must be given by main
+            af.api.save_score(email,score)
+            winwindow.mainloop()
+    
+        
 class jeu:
     def __init__(self):
+
         
         self.numero_canvas=1 #Enable to switch between two canvas to avoid blink
+        self.beginning_score=time.time()
         self.debut_time=time.time()
         self.real_time=0
         self.end_time=0
@@ -24,17 +38,22 @@ class jeu:
         self.firetab=[]
         self.comets=[]
         self.score=0
-         
 
+        self.end=0        
+        
         self.canvas = Canvas(self.root,width=960,height=540,highlightthickness=0)
         self.canvas2 = Canvas(self.root,width=960,height=540,highlightthickness=0)
         self.canvas.grid(column=0,row=0)
         self.canvas2.grid(column=0,row=0)
-        
+
+          
         self.photo = PhotoImage(file="pictures/rocket.png")
         self.fire_pic = PhotoImage(file="pictures/missile.png")
         self.comets_pic = PhotoImage(file="pictures/comets.png")
         self.back_pic = PhotoImage(file="pictures/background.png")
+
+        
+
         
         self.explosion_pic1 = PhotoImage(file="pictures/explosions/explosion1.png")
         self.explosion_pic2 = PhotoImage(file="pictures/explosions/explosion2.png")
@@ -60,6 +79,7 @@ class jeu:
         self.create_new_comets()
         self.printer()
         self.root.mainloop()
+        end_game(int((time.time()-self.beginning_score)*10)/10)
         
     def move(self,event):
     #NB : Some event.char have two options because we use a french keyboard not a swedish one, so our key are not exactly in the same place
@@ -165,66 +185,72 @@ class jeu:
 
         #Before changing, the "life" we check if we haven't fail
         if self.number_of_collision>4:
-            winwindow = Tk()     
-            champ_label = Label(winwindow, text="Game Over !")
-            champ_label.pack()
             self.root.destroy()
-            winwindow.mainloop()
+            self.end=1
+
             
-        canvas.create_line(20,20,300,20,fill="green",width=5)
-        canvas.create_line(300-47*self.number_of_collision,20,300,20,fill="red",width=5)
+        if self.end!=1:
+            canvas.create_line(20,20,300,20,fill="green",width=5)
+            canvas.create_line(300-60*self.number_of_collision,20,300,20,fill="red",width=5)
 
-        self.collision()
-        self.collision_spaceship()
-        
-        canvas.grid(row=0,column=0)
-        
-        for k in range(len(self.tab_destroy_time)):
-            if self.destroy_firetab[k]!="none":
-                i=self.destroy_firetab[k]
-                
-                
-                if self.tab_destroy_time[k][0]==0:
+            self.collision()
+            self.collision_spaceship()
+            
+            
+            for k in range(len(self.tab_destroy_time)):
+                if self.destroy_firetab[k]!="none":
+                    i=self.destroy_firetab[k]
                     
                     
-                    self.tab_destroy_time[k][1]=self.firetab[i][0]
-                    self.tab_destroy_time[k][2]=self.firetab[i][1]
+                    if self.tab_destroy_time[k][0]==0:
+                        
+                        
+                        self.tab_destroy_time[k][1]=self.firetab[i][0]
+                        self.tab_destroy_time[k][2]=self.firetab[i][1]
 
-                    self.comets.pop(self.destroy_comets[k])
-                    self.firetab.pop(self.destroy_firetab[k])
+                        self.comets.pop(self.destroy_comets[k])
+                        self.firetab.pop(self.destroy_firetab[k])
+                        
+                        canvas.create_image(self.tab_destroy_time[k][1],self.tab_destroy_time[k][2],image=self.explosion_pic1)
+                        
+                    elif self.tab_destroy_time[k][0]<=10 and self.tab_destroy_time[k][0]!=0:
                     
-                    canvas.create_image(self.tab_destroy_time[k][1],self.tab_destroy_time[k][2],image=self.explosion_pic1)
+                        canvas.create_image(self.tab_destroy_time[k][1],self.tab_destroy_time[k][2],image=self.explosion_pic2)
+                        
+                    elif self.tab_destroy_time[k][0]<=15 and self.tab_destroy_time[k][0]>10:
                     
-                elif self.tab_destroy_time[k][0]<=10 and self.tab_destroy_time[k][0]!=0:
-                
-                    canvas.create_image(self.tab_destroy_time[k][1],self.tab_destroy_time[k][2],image=self.explosion_pic2)
-                    
-                elif self.tab_destroy_time[k][0]<=15 and self.tab_destroy_time[k][0]>10:
-                
-                    canvas.create_image(self.tab_destroy_time[k][1],self.tab_destroy_time[k][2],image=self.explosion_pic3)
-                    
-                elif self.tab_destroy_time[k][0]<=20 and self.tab_destroy_time[k][0]>15 :
-             
-                    canvas.create_image(self.tab_destroy_time[k][1],self.tab_destroy_time[k][2],image=self.explosion_pic4)
-      
-                elif self.tab_destroy_time[k][0]<=25 and self.tab_destroy_time[k][0]>20 :
-        
-                    canvas.create_image(self.tab_destroy_time[k][1],self.tab_destroy_time[k][2],image=self.explosion_pic5)
-             
-                elif self.tab_destroy_time[k][0]<=35 and self.tab_destroy_time[k][0]>25 :
-                    
-                    self.destroy_firetab[k]="none"
-                    
-                self.tab_destroy_time[k][0]=self.tab_destroy_time[k][0]+1
-
+                        canvas.create_image(self.tab_destroy_time[k][1],self.tab_destroy_time[k][2],image=self.explosion_pic3)
+                        
+                    elif self.tab_destroy_time[k][0]<=20 and self.tab_destroy_time[k][0]>15 :
+                 
+                        canvas.create_image(self.tab_destroy_time[k][1],self.tab_destroy_time[k][2],image=self.explosion_pic4)
+          
+                    elif self.tab_destroy_time[k][0]<=25 and self.tab_destroy_time[k][0]>20 :
+            
+                        canvas.create_image(self.tab_destroy_time[k][1],self.tab_destroy_time[k][2],image=self.explosion_pic5)
+                 
+                    elif self.tab_destroy_time[k][0]<=35 and self.tab_destroy_time[k][0]>25 :
+                        
+                        self.destroy_firetab[k]="none"
+                        
+                    self.tab_destroy_time[k][0]=self.tab_destroy_time[k][0]+1
 
 
-        self.comet_out_of_window()
-        if (self.end_time-self.comets_time)>=2/(self.more_meteores/500):
-            self.comets_time=self.end_time
-            self.create_new_comets()
-        
-        self.more_meteores=self.more_meteores+1
-        threading.Timer(0.00005, self.printer).start()
+
+            self.comet_out_of_window()
+            if (self.end_time-self.comets_time)>=2/(self.more_meteores/500):
+                self.comets_time=self.end_time
+                self.create_new_comets()
+            
+            self.t = Text(self.root, height=2, width=15)
+            self.t.insert(INSERT, "Score: "+ str(int((time.time()-self.beginning_score)*10)/10))
+           
+            
+            self.more_meteores=self.more_meteores+1
+            
+            canvas.grid(row=0)
+            self.t.grid(row=1)
+            
+            threading.Timer(0.00005, self.printer).start()
 
 jeu()
