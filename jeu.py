@@ -54,6 +54,20 @@ class jeu:
         self.fire_pic = PhotoImage(file="pictures/missile.png")
         self.comets_pic = PhotoImage(file="pictures/comets.png")
         self.back_pic = PhotoImage(file="pictures/background.png")
+        self.life_pic = PhotoImage(file="pictures/life.png")
+        
+        self.one_pic = PhotoImage(file="pictures/numbers/1.png")
+        self.two_pic = PhotoImage(file="pictures/numbers/2.png")
+        self.three_pic = PhotoImage(file="pictures/numbers/3.png")
+        self.four_pic = PhotoImage(file="pictures/numbers/4.png")
+        self.five_pic = PhotoImage(file="pictures/numbers/5.png")
+        self.six_pic = PhotoImage(file="pictures/numbers/6.png")
+        self.seven_pic = PhotoImage(file="pictures/numbers/7.png")
+        self.eight_pic = PhotoImage(file="pictures/numbers/8.png")
+        self.nine_pic = PhotoImage(file="pictures/numbers/9.png")
+        self.zero_pic = PhotoImage(file="pictures/numbers/0.png")
+
+
 
         
 
@@ -195,9 +209,13 @@ class jeu:
 
             
         if self.end!=1:
-            canvas.create_line(20,20,300,20,fill="green",width=5)
-            canvas.create_line(300-60*self.number_of_collision,20,300,20,fill="red",width=5)
-
+            canvas.create_rectangle(18,16,321,24,fill="black") #MOD
+            canvas.create_line(20,20,320,20,fill="green",width=5) #MOD 
+            canvas.create_line(320-60*self.number_of_collision,20,320,20,fill="red",width=5)#MOD
+            if self.number_of_collision>=1:                
+                canvas.create_line(320-60*self.number_of_collision,16,320-60*self.number_of_collision,24,fill="black",width=3) #MOD
+            canvas.create_image(50,32,image=self.life_pic)
+            
             self.collision()
             self.collision_spaceship()
             
@@ -277,9 +295,33 @@ class jeu:
                 self.create_new_comets()
             
             self.t = Text(self.root, height=2, width=15)
-            self.t.insert(INSERT, "Score: "+ str(int((time.time()-self.beginning_score)*10)/10))
-           
+            actual_score=str(int((time.time()-self.beginning_score)*10))
             
+            L=len(actual_score)
+            for w in range(0,len(actual_score)): 
+                if (actual_score[w]=="0"):
+                    canvas.create_image(900-35*L,30,image=self.zero_pic)
+                elif (actual_score[w]=="1"):
+                    canvas.create_image(900-35*L,30,image=self.one_pic)
+                elif (actual_score[w]=="2"):
+                    canvas.create_image(900-35*L,30,image=self.two_pic)
+                elif (actual_score[w]=="3"):
+                    canvas.create_image(900-35*L,30,image=self.three_pic)
+                elif (actual_score[w]=="4"):
+                    canvas.create_image(900-35*L,30,image=self.four_pic)
+                elif (actual_score[w]=="5"):
+                    canvas.create_image(900-35*L,30,image=self.five_pic)
+                elif (actual_score[w]=="6"):
+                    canvas.create_image(900-35*L,30,image=self.six_pic)
+                elif (actual_score[w]=="7"):
+                    canvas.create_image(900-35*L,30,image=self.seven_pic)
+                elif (actual_score[w]=="8"):
+                    canvas.create_image(900-35*L,30,image=self.eight_pic)
+                elif (actual_score[w]=="9"):
+                    canvas.create_image(900-35*L,30,image=self.nine_pic)
+                L=L-1
+                  
+            self.t.insert(INSERT, "Score: "+actual_score ) 
             self.more_meteores=self.more_meteores+1
             
             canvas.grid(row=0)
