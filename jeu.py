@@ -5,23 +5,23 @@ import threading
 import time
 import random
 class end_game:
-    def __init__(self,score):
+    def __init__(self,score,email):
             winwindow = Tk()     
             champ_label = Label(winwindow, text="Game Over !")
             champ_label.grid(row=0,column=0)
             button = Button(winwindow, text="Restart") # reload the game I tried command=jeu but didn't work (spaceship doesn't move if we do that)
             button.grid(row=1,column=0)
-            email="maximilien.drouet@edu.ece.fr" #email must be given by main
+            
             af.api.save_score(email,score)
             winwindow.mainloop()
     
         
 class jeu:
-    def __init__(self):
+    def __init__(self,email):
 
         
         self.numero_canvas=1 #Enable to switch between two canvas to avoid blink
-        self.beginning_score=time.time()
+        
         self.debut_time=time.time()
         self.real_time=0
         self.end_time=0
@@ -29,6 +29,9 @@ class jeu:
         self.more_meteores=1
         self.number_of_collision=0
 
+        self.explosion_ship_number=0
+        self.explosion_ship_statu=[]
+        
         self.tab_destroy_time=[]
         self.destroy_firetab=[]
         self.destroy_comets=[]
@@ -77,9 +80,10 @@ class jeu:
         self.canvas2.bind("<Button-1>",self.create_new_fire)
         
         self.create_new_comets()
+        self.beginning_score=time.time()
         self.printer()
         self.root.mainloop()
-        end_game(int((time.time()-self.beginning_score)*10)/10)
+        end_game(int((time.time()-self.beginning_score)*10)/10,email)
         
     def move(self,event):
     #NB : Some event.char have two options because we use a french keyboard not a swedish one, so our key are not exactly in the same place
@@ -122,7 +126,7 @@ class jeu:
                     if ((self.comets[j][1]>self.firetab[i][1]) and self.comets[j][1]<(self.firetab[i][1]+26))or((self.comets[j][1]+47>self.firetab[i][1]) and self.comets[j][1]+47<(self.firetab[i][1]+26)):
                         self.destroy_comets.append(j)
                         self.destroy_firetab.append(i)
-                        self.tab_destroy_time=self.tab_destroy_time+[[0,0,0]]
+                        self.tab_destroy_time=self.tab_destroy_time+[[0,0,0]]#to say the step but also the position of the destruction
 
     def collision_spaceship(self):
         tab=[]
@@ -130,8 +134,9 @@ class jeu:
             if ((self.comets[j][0]>self.x) and self.comets[j][0]<self.x+125)or((self.comets[j][0]+59>self.x) and self.comets[j][0]+59<self.x+125):
                 if ((self.comets[j][1]>self.y) and self.comets[j][1]<self.y+125)or((self.comets[j][1]+47>self.y) and self.comets[j][1]+47<self.y+125):
                     tab=tab+[j]
-                    self.destroy_firetab=self.destroy_firetab+[j]
                     self.number_of_collision=self.number_of_collision+1
+                    self.explosion_ship_number=1
+                    self.explosion_ship_statu=self.explosion_ship_statu+[0]
         for i in range (len(tab)):
             self.comets.pop(tab[i]) 
 
@@ -205,12 +210,15 @@ class jeu:
                     if self.tab_destroy_time[k][0]==0:
                         
                         
-                        self.tab_destroy_time[k][1]=self.firetab[i][0]
-                        self.tab_destroy_time[k][2]=self.firetab[i][1]
-
-                        self.comets.pop(self.destroy_comets[k])
-                        self.firetab.pop(self.destroy_firetab[k])
                         
+                        try:
+                            self.tab_destroy_time[k][1]=self.firetab[i][0]
+                            self.tab_destroy_time[k][2]=self.firetab[i][1]
+                            
+                            self.comets.pop(self.destroy_comets[k])
+                            self.firetab.pop(self.destroy_firetab[k])
+                        except:
+                            self.destroy_firetab[k]="none"
                         canvas.create_image(self.tab_destroy_time[k][1],self.tab_destroy_time[k][2],image=self.explosion_pic1)
                         
                     elif self.tab_destroy_time[k][0]<=10 and self.tab_destroy_time[k][0]!=0:
@@ -229,14 +237,40 @@ class jeu:
             
                         canvas.create_image(self.tab_destroy_time[k][1],self.tab_destroy_time[k][2],image=self.explosion_pic5)
                  
-                    elif self.tab_destroy_time[k][0]<=35 and self.tab_destroy_time[k][0]>25 :
+                    elif self.tab_destroy_time[k][0]>25 :
                         
                         self.destroy_firetab[k]="none"
                         
                     self.tab_destroy_time[k][0]=self.tab_destroy_time[k][0]+1
 
 
-
+            if self.explosion_ship_number == 1 :
+                for i in range (len(self.explosion_ship_statu)):
+                  
+                        
+                    if self.explosion_ship_statu[i]<=10 and self.explosion_ship_statu[i]>=0:
+                        
+                        canvas.create_image(self.x,self.y,image=self.explosion_pic2)
+                            
+                    elif self.explosion_ship_statu[i]<=15 and self.explosion_ship_statu[i]>10:
+                        
+                        canvas.create_image(self.x,self.y,image=self.explosion_pic3)
+                            
+                    elif self.explosion_ship_statu[i]<=20 and self.explosion_ship_statu[i]>15 :
+                     
+                        canvas.create_image(self.x,self.y,image=self.explosion_pic4)
+            
+                    elif self.explosion_ship_statu[i]<=25 and self.explosion_ship_statu[i]>20 :
+                
+                        canvas.create_image(self.x,self.y,image=self.explosion_pic5)
+                     
+                    if  self.explosion_ship_statu[i]<26 :
+                        self.explosion_ship_number=1
+                        self.explosion_ship_statu[i]=self.explosion_ship_statu[i]+1
+                        
+                    else:
+                        self.explosion_ship_number=0
+            
             self.comet_out_of_window()
             if (self.end_time-self.comets_time)>=2/(self.more_meteores/500):
                 self.comets_time=self.end_time
@@ -253,4 +287,4 @@ class jeu:
             
             threading.Timer(0.00005, self.printer).start()
 
-jeu()
+jeu("maxiland@icloud.com")

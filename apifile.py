@@ -2,9 +2,9 @@ import sqlite3
 from tkinter import *
 
 
-
 class api :
-    def create_new_user(self,address,password):
+    def create_new_user(self,address,password,root):
+        import jeu as jeu
         check=0
         match = re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', address)
         
@@ -25,9 +25,14 @@ class api :
                 connection.commit()
                 connection.close()
                 print("Account created")
+                root.destroy()
+                jeu.jeu(address)
+                
+                
 
             
-    def connexion(self,address,password):
+    def connexion(self,address,password,root):
+        import jeu as jeu
         check=0
         connection = sqlite3.connect('listplayer.db')
         cursor = connection.execute("SELECT Email, Password FROM players")
@@ -38,6 +43,9 @@ class api :
                 check=1
                 if i[1]==password:
                     print('ok')
+                    root.destroy()
+                    jeu.jeu(address)
+                
                     
                 else:
                     print('wrong password')
@@ -55,7 +63,8 @@ class api :
             if i[0]==email and i[1]<score:
                 connection.execute('''UPDATE players SET Score ='''+str(score)+'''  WHERE Email == "'''+email+'''"''')
                 
-        connection.commit()
+        connection.commit()
+
         connection.close()
             
 
