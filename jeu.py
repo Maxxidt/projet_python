@@ -52,8 +52,13 @@ class jeu:
           
         self.photo = PhotoImage(file="pictures/rocket.png")
         self.fire_pic = PhotoImage(file="pictures/missile.png")
-        self.comets_pic = PhotoImage(file="pictures/comets.png")
-        self.comets_pic_2 = PhotoImage(file="pictures/cometssuiv.png")
+        
+        self.comets_pic = PhotoImage(file="pictures/comets1.png") 
+        self.comets_pic_2 = PhotoImage(file="pictures/comets2.png") 
+        self.comets_pic_3 = PhotoImage(file="pictures/comets3.png") 
+        self.comets_pic_4 = PhotoImage(file="pictures/comets4.png") 
+        self.comets_pic_0 = PhotoImage(file="pictures/cometssuiv.png") 
+        
         self.back_pic = PhotoImage(file="pictures/background.png")
         self.life_pic = PhotoImage(file="pictures/life.png")
         self.game_over_pic = PhotoImage(file="pictures/gameover.png")
@@ -143,11 +148,21 @@ class jeu:
         self_comets_x=random.randint(200,900)
         depx=2*(self.x-self_comets_x)/sqrt((self_comets_x-self.x)**2+(self_comets_y-self.y)**2)
         depy=2*(self.y-self_comets_y)/sqrt((self_comets_x-self.x)**2+(self_comets_y-self.y)**2)       
-        if len(self.comets)% 2 != 0 or len(self.comets)<3:
-            self.comets=self.comets+[[self_comets_x,self_comets_y,depx,depy,0]]
-        else :
-            self.comets=self.comets+[[self_comets_x,self_comets_y,depx,depy,1]]#1 ou 0 pour savoir si la comet suit ou non le vaisseau
+        if len(self.comets)% 2 != 0 or len(self.comets)<3: 
+            comets_number=random.randint(1,4)
+            if comets_number==1:
+                self.comets=self.comets+[[self_comets_x,self_comets_y,depx,depy,1]]
+            elif comets_number==2:
+                self.comets=self.comets+[[self_comets_x,self_comets_y,depx,depy,2]]
+            elif comets_number==3:
+                self.comets=self.comets+[[self_comets_x,self_comets_y,depx,depy,3]]
+            elif comets_number==4:
+                self.comets=self.comets+[[self_comets_x,self_comets_y,depx,depy,4]]
             
+        else :
+            self.comets=self.comets+[[self_comets_x,self_comets_y,depx,depy,0]]
+            
+
 
     def actualise_comets_2(self):
         for i in self.comets:
@@ -227,17 +242,28 @@ class jeu:
 
         self.actualise_comets_2()
         for i in self.comets:
+            if i[4]==1: 
                 canvas.create_image(i[0],i[1],image=self.comets_pic)
+            elif i[4]==2: 
+                canvas.create_image(i[0],i[1],image=self.comets_pic_2)
+            elif i[4]==3: 
+                canvas.create_image(i[0],i[1],image=self.comets_pic_3)
+            elif i[4]==4:
+                canvas.create_image(i[0],i[1],image=self.comets_pic_4)
+            elif i[4]==0 :
+                canvas.create_image(i[0],i[1],image=self.comets_pic_0)
+            
+
          
         canvas.create_image(self.x,self.y,image=self.photo)
         
 
     def mod(self,canvas):
-        canvas.create_rectangle(18,16,321,24,fill="black") #MOD
-        canvas.create_line(20,20,320,20,fill="green",width=5) #MOD 
-        canvas.create_line(320-60*self.number_of_collision,20,320,20,fill="red",width=5)#MOD
+        canvas.create_rectangle(18,16,321,24,fill="black") 
+        canvas.create_line(20,20,320,20,fill="green",width=5) 
+        canvas.create_line(320-60*self.number_of_collision,20,320,20,fill="red",width=5)
         if self.number_of_collision>=1:                
-            canvas.create_line(320-60*self.number_of_collision,16,320-60*self.number_of_collision,24,fill="black",width=3) #MOD
+            canvas.create_line(320-60*self.number_of_collision,16,320-60*self.number_of_collision,24,fill="black",width=3) 
         canvas.create_image(50,32,image=self.life_pic)
 
 
