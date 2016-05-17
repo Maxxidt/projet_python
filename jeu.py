@@ -53,6 +53,7 @@ class jeu:
         self.photo = PhotoImage(file="pictures/rocket.png")
         self.fire_pic = PhotoImage(file="pictures/missile.png")
         self.comets_pic = PhotoImage(file="pictures/comets.png")
+        self.comets_pic_2 = PhotoImage(file="pictures/cometssuiv.png")
         self.back_pic = PhotoImage(file="pictures/background.png")
         self.life_pic = PhotoImage(file="pictures/life.png")
         
@@ -131,8 +132,18 @@ class jeu:
         self_comets_x=random.randint(200,900)
         depx=2*(self.x-self_comets_x)/sqrt((self_comets_x-self.x)**2+(self_comets_y-self.y)**2)
         depy=2*(self.y-self_comets_y)/sqrt((self_comets_x-self.x)**2+(self_comets_y-self.y)**2)       
-        self.comets=self.comets+[[self_comets_x,self_comets_y,depx,depy]]
-       
+        if len(self.comets)% 2 != 0 or len(self.comets)<3:
+            self.comets=self.comets+[[self_comets_x,self_comets_y,depx,depy,0]]
+        else :
+            self.comets=self.comets+[[self_comets_x,self_comets_y,depx,depy,1]]
+            
+    def actualise_comets_2(self):
+        for i in self.comets:
+            if i[4]==1:
+                i[2]=2*(self.x-i[0])/sqrt((i[0]-self.x)**2+(i[1]-self.y)**2)
+                i[3]=2*(self.y-i[1])/sqrt((i[0]-self.x)**2+(i[1]-self.y)**2)       
+        
+        
     def collision(self): 
         for i in range(len(self.firetab)):
             for j in range(len(self.comets)):
@@ -195,9 +206,12 @@ class jeu:
         
         for i in self.firetab:
             canvas.create_image(i[0],i[1],image=self.fire_pic)
-                
+        self.actualise_comets_2()
         for i in self.comets:
-            canvas.create_image(i[0],i[1],image=self.comets_pic)
+            if i[4]==0:
+                canvas.create_image(i[0],i[1],image=self.comets_pic)
+            else :
+                canvas.create_image(i[0],i[1],image=self.comets_pic_2)
             
         canvas.create_image(self.x,self.y,image=self.photo)
         
@@ -294,7 +308,7 @@ class jeu:
                 self.comets_time=self.end_time
                 self.create_new_comets()
             
-            self.t = Text(self.root, height=2, width=15)
+            
             actual_score=str(int((time.time()-self.beginning_score)*10))
             
             L=len(actual_score)
@@ -321,11 +335,11 @@ class jeu:
                     canvas.create_image(900-35*L,30,image=self.nine_pic)
                 L=L-1
                   
-            self.t.insert(INSERT, "Score: "+actual_score ) 
+            
             self.more_meteores=self.more_meteores+1
             
             canvas.grid(row=0)
-            self.t.grid(row=1)
+            
             
             threading.Timer(0.00005, self.printer).start()
 
