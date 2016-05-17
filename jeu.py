@@ -6,14 +6,8 @@ import time
 import random
 class end_game:
     def __init__(self,score,email):
-            winwindow = Tk()     
-            champ_label = Label(winwindow, text="Game Over !")
-            champ_label.grid(row=0,column=0)
-            button = Button(winwindow, text="Restart") # reload the game I tried command=jeu but didn't work (spaceship doesn't move if we do that)
-            button.grid(row=1,column=0)
-            
             af.api.save_score(email,score)
-            winwindow.mainloop()
+            
     
         
 class jeu:
@@ -56,6 +50,7 @@ class jeu:
         self.comets_pic_2 = PhotoImage(file="pictures/cometssuiv.png")
         self.back_pic = PhotoImage(file="pictures/background.png")
         self.life_pic = PhotoImage(file="pictures/life.png")
+        self.game_over_pic = PhotoImage(file="pictures/gameover.png")
         
         self.one_pic = PhotoImage(file="pictures/numbers/1.png")
         self.two_pic = PhotoImage(file="pictures/numbers/2.png")
@@ -184,45 +179,49 @@ class jeu:
             canvas=self.canvas2
             self.numero_canvas=1
             
-        #Time calculation to slow the game, to avoid an information saturation
-        self.end_time=time.time()
-        self.real_time=self.end_time-self.debut_time
-        self.real_time=round(self.real_time,2)
-        self.debut_time=self.end_time
-
-        #Clean the window
-        canvas.grid_forget()
-        canvas.delete("all")        
-            
-        for i in self.firetab:
-            i[0]=i[0]+i[2]
-            i[1]=i[1]+i[3]        
-        for i in self.comets:
-            i[0]=i[0]+i[2]
-            i[1]=i[1]+i[3]
-        
-        #Creation of the new window : background, comets and spaceship
-        canvas.create_image(self.x2,self.y2,image=self.back_pic)
-        
-        for i in self.firetab:
-            canvas.create_image(i[0],i[1],image=self.fire_pic)
-        self.actualise_comets_2()
-        for i in self.comets:
-            if i[4]==0:
-                canvas.create_image(i[0],i[1],image=self.comets_pic)
-            else :
-                canvas.create_image(i[0],i[1],image=self.comets_pic_2)
-            
-        canvas.create_image(self.x,self.y,image=self.photo)
         
 
         #Before changing, the "life" we check if we haven't fail
         if self.number_of_collision>4:
-            self.root.destroy()
+            
+            canvas.create_image(480,270,image=self.game_over_pic)
             self.end=1
 
             
         if self.end!=1:
+
+                    #Time calculation to slow the game, to avoid an information saturation
+            self.end_time=time.time()
+            self.real_time=self.end_time-self.debut_time
+            self.real_time=round(self.real_time,2)
+            self.debut_time=self.end_time
+
+            #Clean the window
+            canvas.grid_forget()
+            canvas.delete("all")        
+                
+            for i in self.firetab:
+                i[0]=i[0]+i[2]
+                i[1]=i[1]+i[3]        
+            for i in self.comets:
+                i[0]=i[0]+i[2]
+                i[1]=i[1]+i[3]
+            
+            #Creation of the new window : background, comets and spaceship
+            canvas.create_image(self.x2,self.y2,image=self.back_pic)
+            
+            for i in self.firetab:
+                canvas.create_image(i[0],i[1],image=self.fire_pic)
+            self.actualise_comets_2()
+            for i in self.comets:
+                if i[4]==0:
+                    canvas.create_image(i[0],i[1],image=self.comets_pic)
+                else :
+                    canvas.create_image(i[0],i[1],image=self.comets_pic_2)
+                
+            canvas.create_image(self.x,self.y,image=self.photo)
+
+            
             canvas.create_rectangle(18,16,321,24,fill="black") #MOD
             canvas.create_line(20,20,320,20,fill="green",width=5) #MOD 
             canvas.create_line(320-60*self.number_of_collision,20,320,20,fill="red",width=5)#MOD
