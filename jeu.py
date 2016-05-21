@@ -6,9 +6,10 @@ import time
 import random
 class end_game:
     
-    def __init__(self,score,email):
+    def __init__(self,score,email,user_want_to_quit):
             af.api.save_score(email,score)
-            
+            if user_want_to_quit==0:
+                jeu(email)
     
         
 class jeu:
@@ -41,7 +42,7 @@ class jeu:
         self.firetab=[]
         self.comets=[]
         self.score=0
-
+        self.user_want_to_quit=0
         self.end=0        
         
         self.canvas = Canvas(self.root,width=960,height=540,highlightthickness=0)
@@ -107,7 +108,7 @@ class jeu:
         self.beginning_score=time.time()
         self.printer()
         self.root.mainloop()
-        end_game(int((time.time()-self.beginning_score)*10)/10,email)
+        end_game(int((time.time()-self.beginning_score)*10)/10,email,s)
 
         
     def move_and_superpower(self,event):
@@ -128,6 +129,10 @@ class jeu:
         elif ((event.char=="d") or (event.char=="D"))and(self.x<904):            
             self.x=self.x+8
             self.x2=self.x2-3
+
+        elif event.char=="L" or event.char=="l":
+            self.user_want_to_quit=1
+            self.root.destroy()
         elif (event.char=="G" or event.char=="g")and self.number_of_shoot>10:
             self.number_of_shoot=0
             
@@ -150,17 +155,11 @@ class jeu:
         depy=2*(self.y-self_comets_y)/sqrt((self_comets_x-self.x)**2+(self_comets_y-self.y)**2)       
         if len(self.comets)% 2 != 0 or len(self.comets)<3: 
             comets_number=random.randint(1,4)
-            if comets_number==1:
-                self.comets=self.comets+[[self_comets_x,self_comets_y,depx,depy,1]]
-            elif comets_number==2:
-                self.comets=self.comets+[[self_comets_x,self_comets_y,depx,depy,2]]
-            elif comets_number==3:
-                self.comets=self.comets+[[self_comets_x,self_comets_y,depx,depy,3]]
-            elif comets_number==4:
-                self.comets=self.comets+[[self_comets_x,self_comets_y,depx,depy,4]]
+            self.comets=self.comets+[[self_comets_x,self_comets_y,depx,depy,comets_number]] # don't follow the spaceship
+           
             
         else :
-            self.comets=self.comets+[[self_comets_x,self_comets_y,depx,depy,0]]
+            self.comets=self.comets+[[self_comets_x,self_comets_y,depx,depy,0]] # follow the spaceship
             
 
 
@@ -205,6 +204,10 @@ class jeu:
             
 
     def destroy_f(self,event):
+        if event.char=="L" or event.char=="l":
+            self.user_want_to_quit=1
+        
+            
         self.root.destroy()
         
 
