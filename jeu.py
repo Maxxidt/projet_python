@@ -4,12 +4,16 @@ import apifile as af
 import threading
 import time
 import random
+
 class end_game:
     
     def __init__(self,score,email,user_want_to_quit):
             af.api.save_score(email,score)
             if user_want_to_quit==0:
                 jeu(email)
+            else:
+                import menu as menu
+                menu.menu(email)
     
         
 class jeu:
@@ -63,7 +67,6 @@ class jeu:
         self.back_pic = PhotoImage(file="pictures/background.png")
         self.life_pic = PhotoImage(file="pictures/life.png")
         self.game_over_pic = PhotoImage(file="pictures/gameover.png")
-        self.restart_pic = PhotoImage(file="pictures/restart.png")
         self.superpower_pic = PhotoImage(file="pictures/superpower.png")
         
         self.one_pic = PhotoImage(file="pictures/numbers/1.png")
@@ -108,7 +111,7 @@ class jeu:
         self.beginning_score=time.time()
         self.printer()
         self.root.mainloop()
-        end_game(int((time.time()-self.beginning_score)*10)/10,email,s)
+        end_game(int((time.time()-self.beginning_score)*10)/10,email,self.user_want_to_quit)
 
         
     def move_and_superpower(self,event):
@@ -216,7 +219,6 @@ class jeu:
             canvas.grid_forget()
             canvas.delete("all") 
             canvas.create_image(480,270,image=self.game_over_pic)
-            canvas.create_image(70,60,image=self.restart_pic)
             canvas.bind("<Key>",self.destroy_f)
             canvas.grid(row=1)
             self.end=1
@@ -452,4 +454,3 @@ class jeu:
             
         threading.Timer(0.00005, self.printer).start()
 
-jeu("maxiland@icloud.com")

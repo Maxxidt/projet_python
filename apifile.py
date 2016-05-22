@@ -4,7 +4,7 @@ from tkinter import *
 
 class api :
     def create_new_user(self,address,password,root):
-        import jeu as jeu
+        import menu as menu
         check=0
         match = re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', address)
         
@@ -26,13 +26,13 @@ class api :
                 connection.close()
                 print("Account created")
                 root.destroy()
-                jeu.jeu(address)
+                menu.menu(address)
                 
                 
 
             
     def connexion(self,address,password,root):
-        import jeu as jeu
+        import menu as menu
         check=0
         connection = sqlite3.connect('listplayer.db')
         cursor = connection.execute("SELECT Email, Password FROM players")
@@ -44,7 +44,7 @@ class api :
                 if i[1]==password:
                     print('ok')
                     root.destroy()
-                    jeu.jeu(address)
+                    menu.menu(address)
                 
                     
                 else:
