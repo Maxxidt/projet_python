@@ -7,13 +7,11 @@ import random
 
 class end_game:
     
-    def __init__(self,score,email,user_want_to_quit):
+    def __init__(self,score,email):
             af.api.save_score(email,score)
-            if user_want_to_quit==0:
-                jeu(email)
-            else:
-                import menu as menu
-                menu.menu(email)
+
+            import menu as menu
+            menu.menu(email)
     
         
 class jeu:
@@ -46,7 +44,6 @@ class jeu:
         self.firetab=[]
         self.comets=[]
         self.score=0
-        self.user_want_to_quit=0
         self.end=0        
         
         self.canvas = Canvas(self.root,width=960,height=540,highlightthickness=0)
@@ -63,7 +60,8 @@ class jeu:
         self.comets_pic_3 = PhotoImage(file="pictures/comets3.png") 
         self.comets_pic_4 = PhotoImage(file="pictures/comets4.png") 
         self.comets_pic_0 = PhotoImage(file="pictures/cometssuiv.png") 
-        
+        self.best_score_pic = PhotoImage(file="pictures/best.png")
+        self.fail_pic = PhotoImage(file="pictures/fail.png")
         self.back_pic = PhotoImage(file="pictures/background.png")
         self.life_pic = PhotoImage(file="pictures/life.png")
         self.game_over_pic = PhotoImage(file="pictures/gameover.png")
@@ -80,7 +78,7 @@ class jeu:
         self.nine_pic = PhotoImage(file="pictures/numbers/9.png")
         self.zero_pic = PhotoImage(file="pictures/numbers/0.png")
 
-
+        self.score_final=0
 
         
 
@@ -111,7 +109,7 @@ class jeu:
         self.beginning_score=time.time()
         self.printer()
         self.root.mainloop()
-        end_game(int((time.time()-self.beginning_score)*10)/10,email,self.user_want_to_quit)
+        end_game(self.score_final,email)
 
         
     def move_and_superpower(self,event):
@@ -134,7 +132,6 @@ class jeu:
             self.x2=self.x2-3
 
         elif event.char=="L" or event.char=="l":
-            self.user_want_to_quit=1
             self.root.destroy()
         elif (event.char=="G" or event.char=="g")and self.number_of_shoot>10:
             self.number_of_shoot=0
@@ -220,7 +217,12 @@ class jeu:
             canvas.delete("all") 
             canvas.create_image(480,270,image=self.game_over_pic)
             canvas.bind("<Key>",self.destroy_f)
-            canvas.grid(row=1)
+            if 40<af.api.best_score("maximilien.drouet@edu.ece.fr"):
+                canvas.create_image(480,270,image=self.fail_pic)
+            else:
+                canvas.create_image(480,270,image=self.best_score_pic)
+            
+            canvas.grid(row=0)
             self.end=1
             
 
@@ -411,11 +413,12 @@ class jeu:
             
         
 
-        #Before changing, the "life" we check if we haven't fail
-        self.if_fail(canvas)
+        
+        
 
             
         if self.end!=1:
+            
 
             #Time calculation to slow the game, to avoid an information saturation
             self.time_calc()
@@ -440,7 +443,8 @@ class jeu:
             if (self.end_time-self.comets_time)>=2/(self.more_meteores/500):
                 self.comets_time=self.end_time
                 self.create_new_comets()
-            
+
+            self.score_final=int((time.time()-self.beginning_score)*10)/10
             
             
             self.print_numbers(canvas)
@@ -450,6 +454,9 @@ class jeu:
             self.more_meteores=self.more_meteores+1
             
             canvas.grid(row=0)
+            
+            #Before changing, the "life" we check if we haven't fail
+            self.if_fail(canvas)
             
             
         threading.Timer(0.00005, self.printer).start()

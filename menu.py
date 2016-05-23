@@ -71,8 +71,12 @@ class menu:
         elif  self.position_fire==310:
             self.root.destroy()
             import rules as ru
-            ru.rules(email)
+            ru.rules(self.email)
+        elif self.position_fire==375:
+            self.root.destroy()
+            import score as sc
+            sc.score(self.email)
         elif self.position_fire==505:
             self.root.destroy()
         
-menu('')
+

@@ -36,7 +36,6 @@ class api :
         check=0
         connection = sqlite3.connect('listplayer.db')
         cursor = connection.execute("SELECT Email, Password FROM players")
-        print(cursor)
         for i in cursor:
             
             if i[0]==address:
@@ -66,7 +65,13 @@ class api :
         connection.commit()
 
         connection.close()
-            
+
+    def best_score(email):
+        connection = sqlite3.connect('listplayer.db')
+        cursor = connection.execute("SELECT Email,Score FROM players")
+        for i in cursor:
+            if i[0]==email:
+                return i[1]
 
         
 
