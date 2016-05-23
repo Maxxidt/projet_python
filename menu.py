@@ -76,6 +76,10 @@ class menu:
             self.root.destroy()
             import score as sc
             sc.score(self.email)
+        elif self.position_fire==440:
+            self.root.destroy()
+            import credit as cd
+            cd.credit(self.email)
         elif self.position_fire==505:
             self.root.destroy()
         
