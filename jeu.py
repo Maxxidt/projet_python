@@ -168,7 +168,7 @@ class jeu:
 
     def actualise_comets_2(self):
         for i in self.comets:
-            if i[4]==1:
+            if i[4]==0:
                 i[2]=2*(self.x-i[0])/sqrt((i[0]-self.x)**2+(i[1]-self.y)**2)
                 i[3]=2*(self.y-i[1])/sqrt((i[0]-self.x)**2+(i[1]-self.y)**2)       
         
