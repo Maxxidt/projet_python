@@ -75,4 +75,4 @@ class menu:
         elif self.position_fire==505:
             self.root.destroy()
         
-menu('')
+
