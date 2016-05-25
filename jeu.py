@@ -28,6 +28,7 @@ class jeu:
         self.canvas.grid(column=0,row=0)
         self.canvas2.grid(column=0,row=0)
         self.numero_canvas=1
+
         ##########################################################################
         #here the different variables
         self.debut_time=time.time()
@@ -88,6 +89,7 @@ class jeu:
         self.explosion_pic3 = PhotoImage(file="pictures/explosions/explosion3.png")
         self.explosion_pic4 = PhotoImage(file="pictures/explosions/explosion4.png")
         self.explosion_pic5 = PhotoImage(file="pictures/explosions/explosion5.png")
+
         ##########################################################################
         #Here we have the actions
         self.canvas.bind("<Key>",self.move_and_superpower)
@@ -95,14 +97,17 @@ class jeu:
         self.canvas2.bind("<Key>",self.move_and_superpower)
         self.canvas2.bind("<Button-1>",self.create_new_fire)
         self.canvas.focus_set()
+
         ##########################################################################
         #We start the time and launch the game
         self.beginning_score=time.time()
         self.printer(email)
+
         ##########################################################################
         #End of the loop
         self.root.mainloop()
         end_game(self.score_final,email)
+
 
     ##########################################################################
     #Name: actualise_comets_spaceship_and_fires
@@ -414,7 +419,8 @@ class jeu:
         else:
             canvas=self.canvas2
             self.numero_canvas=1
-            
+        #Before changing, the "life" we check if we haven't fail
+        self.if_fail(canvas,email)
         if self.end!=1:
             
 
@@ -453,11 +459,7 @@ class jeu:
             
             canvas.grid(row=0)
             
-            #Before changing, the "life" we check if we haven't fail
-            self.if_fail(canvas,email)
-            
-            
-        threading.Timer(0.0001, lambda:self.printer(email)).start()
+        threading.Timer(0.00001, lambda:self.printer(email)).start()
 
 
     ##########################################################################

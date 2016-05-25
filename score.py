@@ -5,6 +5,8 @@ class score:
     def __init__(self,email):
         root=Tk()
         
+        ##########################################################################
+        #We load the pictures
         back_pic = PhotoImage(file="pictures/background.png")
         best_pic = PhotoImage(file="pictures/bestmenu.png")
         self.one_pic = PhotoImage(file="pictures/numbers/1.png")
@@ -17,16 +19,26 @@ class score:
         self.eight_pic = PhotoImage(file="pictures/numbers/8.png")
         self.nine_pic = PhotoImage(file="pictures/numbers/9.png")
         self.zero_pic = PhotoImage(file="pictures/numbers/0.png")
-
+        
+        ##########################################################################
+        #We create the canvas
         canvas = Canvas(root,width=960,height=540,highlightthickness=0)
+        
+        ##########################################################################
+        #we print the pictures and the numbers
         canvas.create_image(0,0,image=back_pic)
         canvas.create_image(500,275,image=best_pic)
-
         jeu.jeu.print_numbers(self,canvas,str(int(af.api.best_score(email)*10)),570,250)
-
+        
+        ##########################################################################
+        #we print the canvas
         canvas.grid()
         
+        ##########################################################################
         root.mainloop()
+        
+        ##########################################################################
+        #We bring the user back to the menu
         import menu as menu
         menu.menu(email)
 
