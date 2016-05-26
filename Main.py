@@ -16,12 +16,14 @@ class main:
         ##########################################################################
         #loads the pictures
         back_pic = PhotoImage(file="pictures/background.png")
+        spacewar_pic = PhotoImage(file="pictures/spacewar.png")
         join_pic = PhotoImage(file="pictures/join.png")
 
         ##########################################################################
         #fix the pictures on the canvas
         self.canvas2.create_image(500,275,image=back_pic)
-        self.canvas2.create_image(500,150,image=join_pic)
+        self.canvas2.create_image(500,100,image=spacewar_pic)
+        self.canvas2.create_image(500,200,image=join_pic)
 
         ##########################################################################
         self.sign_in()
